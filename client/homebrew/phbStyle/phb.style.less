@@ -1,6 +1,8 @@
-@import (less) 'shared/naturalCrit/styles/reset.less';
+
+@import (less) 'shared/naturalcrit/styles/reset.less';
 @import (less) './client/homebrew/phbStyle/phb.fonts.css';
 @import (less) './client/homebrew/phbStyle/phb.assets.less';
+@import (less) './client/homebrew/phbStyle/phb.depricated.less';
 //Colors
 @background            : #EEE5CE;
 @noteGreen             : #e0e5c1;
@@ -8,6 +10,13 @@
 @horizontalRule        : #9c2b1b;
 @headerText            : #58180D;
 @monsterStatBackground : #FDF1DC;
+@page { margin: 0; }
+body {
+	counter-reset : phb-page-numbers;
+}
+*{
+	-webkit-print-color-adjust : exact;
+}
 .useSansSerif(){
 	font-family : ScalySans;
 	em{
@@ -15,32 +24,41 @@
 		font-style  : italic;
 	}
 	strong{
-		font-family : ScalySans;
-		font-weight : 800;
+		font-family    : ScalySans;
+		font-weight    : 800;
+		letter-spacing : -0.02em;
 	}
 }
-.phb{
-	position             : relative;
-	z-index              : 15;
-	box-sizing           : border-box;
-	overflow             : hidden;
-	height               : 279.4mm;
-	width                : 215.9mm;
-	padding              : 1.0cm 1.7cm;
+.useColumns(@multiplier : 1){
 	column-count         : 2;
 	column-fill          : auto;
 	column-gap           : 1cm;
-	column-width         : 8cm;
-	background-color     : @background;
-	background-image     : @backgroundImage;
-	font-family          : BookSanity;
-	font-size            : 9pt;
+	column-width         : 8cm * @multiplier;
 	-webkit-column-count : 2;
 	-moz-column-count    : 2;
-	-webkit-column-width : 8cm;
-	-moz-column-width    : 8cm;
+	-webkit-column-width : 8cm * @multiplier;
+	-moz-column-width    : 8cm * @multiplier;
 	-webkit-column-gap   : 1cm;
-	text-rendering       : optimizeLegibility;
+	-moz-column-gap      : 1cm;
+}
+.phb{
+	.useColumns();
+	counter-increment : phb-page-numbers;
+	position          : relative;
+	z-index           : 15;
+	box-sizing        : border-box;
+	overflow          : hidden;
+	height            : 279.4mm;
+	width             : 215.9mm;
+	padding           : 1.0cm 1.7cm;
+	padding-bottom    : 1.5cm;
+	background-color  : @background;
+	background-image  : @backgroundImage;
+	font-family       : BookSanity;
+	font-size         : 0.317cm;
+	text-rendering    : optimizeLegibility;
+	page-break-before : always;
+	page-break-after  : always;
 	//*****************************
 	// *            BASE
 	// *****************************/
@@ -48,24 +66,46 @@
 		padding-bottom : 0.8em;
 		line-height    : 1.3em;
 		&+p{
-			margin-top  : -0.8em;
-			text-indent : 1em;
+			margin-top : -0.8em;
 		}
 	}
 	ul{
 		margin-bottom       : 0.8em;
+		padding-left        : 1.4em;
 		line-height         : 1.3em;
-		list-style-position : inside;
+		list-style-position : outside;
 		list-style-type     : disc;
+	}
+	ol{
+		margin-bottom       : 0.8em;
+		padding-left        : 1.4em;
+		line-height         : 1.3em;
+		list-style-position : outside;
+		list-style-type     : decimal;
+	}
+	//Indents after p or lists
+	p+p, ul+p, ol+p{
+		text-indent : 1em;
 	}
 	img{
 		z-index : -1;
 	}
 	strong{
-		font-weight : bold;
+		font-weight    : bold;
+		letter-spacing : 0.03em;
 	}
 	em{
 		font-style : italic;
+	}
+	sup{
+		vertical-align : super;
+		font-size      : smaller;
+		line-height    : 0;
+	}
+	sub{
+		vertical-align : sub;
+		font-size      : smaller;
+		line-height    : 0;
 	}
 	//*****************************
 	// *           HEADERS
@@ -79,32 +119,32 @@
 	}
 	h1{
 		column-span         : all;
-		font-size           : 28pt;
+		font-size           : 0.987cm;
 		-webkit-column-span : all;
+		-moz-column-span    : all;
 		&+p::first-letter{
-			float         : left;
-			margin-top    : 0.4em;
-			margin-bottom : 0.4em;
-			font-family   : Solberry;
-			font-size     : 10em;
-			color         : #222;
+			float       : left;
+			font-family : Solberry;
+			font-size   : 10em;
+			color       : #222;
+			line-height : 0.8em;
 		}
 	}
 	h2{
-		font-size : 20pt;
+		font-size : 0.705cm;
 	}
 	h3{
-		font-size     : 15pt;
+		font-size     : 0.529cm;
 		border-bottom : 2px solid @headerUnderline;
 	}
 	h4{
 		margin-bottom : 0.00em;
-		font-size     : 12pt;
+		font-size     : 0.458cm;
 	}
 	h5{
 		margin-bottom : 0.2em;
 		font-family   : ScalySansSmallCaps;
-		font-size     : 13pt;
+		font-size     : 0.423cm;
 		font-weight   : 900;
 	}
 	//*****************************
@@ -116,6 +156,7 @@
 		margin-bottom : 1em;
 		font-size     : 10pt;
 		thead{
+			display: table-row-group;
 			font-weight : 800;
 			th{
 				vertical-align : bottom;
@@ -127,7 +168,7 @@
 		tbody{
 			tr{
 				td{
-					padding : 0.2em 0.1em;
+					padding : 0.3em 0.1em;
 				}
 				&:nth-child(odd){
 					background-color : @noteGreen;
@@ -140,26 +181,36 @@
 	// *****************************/
 	blockquote{
 		.useSansSerif();
-		box-sizing       : border-box;
-		margin-bottom    : 1em;
-		padding          : 5px 10px;
-		background-color : @noteGreen;
-		border-top       : 2px black solid;
-		border-bottom    : 2px black solid;
-		box-shadow       : 1px 4px 14px #888;
+		box-sizing          : border-box;
+		margin-bottom       : 1em;
+		padding             : 5px 10px;
+		background-color    : @noteGreen;
+		border-style        : solid;
+		border-width        : 11px;
+		border-image        : @noteBorderImage 11;
+		border-image-outset : 9px 0px;
+		box-shadow          : 1px 4px 14px #888;
 		p, ul{
-			font-size   : 10pt;
+			font-size   : 0.352cm;
 			line-height : 1.1em;
 		}
+	}
+	//If a note starts a column, give it space at the top to render border
+	pre+blockquote, h2+blockquote, h3+blockquote, h4+blockquote, h5+blockquote {
+		margin-top : 13px;
 	}
 	//*****************************
 	// *    MONSTER STAT BLOCK
 	// *****************************/
 	hr+blockquote{
 		position         : relative;
+		padding-top      : 15px;
 		background-color : @monsterStatBackground;
-		border           : none;
+		border-style     : solid;
+		border-width     : 10px;
+		border-image     : @monsterBorderImage 10;
 		h2{
+			margin-top    : -8px;
 			margin-bottom : 0px;
 			&+p{
 				padding-bottom : 0px;
@@ -170,19 +221,20 @@
 			font-weight   : 400;
 			border-bottom : 1px solid @headerText;
 		}
+		hr+ul{
+			color : @headerText;
+		}
 		ul{
 			.useSansSerif();
-			padding-left    : 1em;
-			font-size       : 10pt;
-			color           : @headerText;
-			text-indent     : -1em;
-			list-style-type : none;
+			padding-left : 1em;
+			font-size    : 0.352cm;
 		}
 		// Monster Ability table
 		hr+table{
 			margin              : 0;
 			column-span         : 1;
 			background-color    : transparent;
+			border-style        : none;
 			border-image        : none;
 			-webkit-column-span : 1;
 			tbody{
@@ -201,63 +253,17 @@
 		}
 		//Triangle dividers
 		hr{
-			@height      : 3px;
-			position     : relative;
-			visibility   : visible;
-			margin       : 8px 0px;
-			border-color : transparent;
-			&:after, &:before{
-				content  : "";
-				position : absolute;
-				left     : 0px;
-				height   : @height;
-				width    : 100%;
-			}
-			&:before{
-				top        : -@height;
-				background : linear-gradient(to right top, @horizontalRule 40%, transparent 50%)
-			}
-			&:after{
-				top        : 0px;
-				background : linear-gradient(to right bottom, @horizontalRule 40%, transparent 50%)
-			}
-		}
-		//Top and Bottom Borders
-		&:after, &:before{
-			content          : "";
-			position         : absolute;
-			height           : 4px;
-			width            : 100%;
-			padding          : 0px 3px;
-			background-color : #E69A28;
-			border           : 1px solid black;
-		}
-		&:before{
-			top  : 0px;
-			left : -3px;
-		}
-		&:after{
-			bottom : 0px;
-			left   : -3px;
+			visibility       : visible;
+			height           : 6px;
+			margin           : 4px 0px;
+			background-image : @redTriangleImage;
+			background-size  : 100% 100%;
+			border           : none;
 		}
 	}
-	//*****************************
-	// *      FULL CLASS TABLE
-	// *****************************/
-	h5+hr+table{
-		margin-top          : -5px;
-		margin-bottom       : 50px;
-		padding-top         : 10px;
-		border-collapse     : separate;
-		column-span         : all;
-		background-color    : white;
-		border              : initial;
-		border-image-outset : 37px 17px;
-		border-image-repeat : round;
-		border-image-slice  : 150 200 150 200;
-		border-image-source : @frameBorderImage;
-		border-image-width  : 47px;
-		-webkit-column-span : all;
+	//Full Width
+	hr+hr+blockquote{
+		.useColumns(0.96);
 	}
 	//*****************************
 	// *           FOOTER
@@ -267,6 +273,7 @@
 		position         : absolute;
 		bottom           : 0px;
 		left             : 0px;
+		z-index          : 100;
 		height           : 50px;
 		width            : 100%;
 		background-image : @footerAccentImage;
@@ -292,11 +299,15 @@
 		font-size  : 0.9em;
 		color      : #c9ad6a;
 		text-align : center;
+		&.auto::after {
+			content : counter(phb-page-numbers);
+		}
 	}
 	.footnote{
 		position   : absolute;
 		right      : 80px;
 		bottom     : 32px;
+		z-index    : 150;
 		width      : 200px;
 		font-size  : 0.8em;
 		color      : #c9ad6a;
@@ -317,21 +328,145 @@
 		list-style-type : none;
 	}
 	//Column Break
-	pre{
+	pre, code{
 		visibility                 : hidden;
 		-webkit-column-break-after : always;
+		break-after                : always;
+		-moz-column-break-after    : always;
 	}
 	//Avoid breaking up
-	p,ul,blockquote,table{
+	p,blockquote,table{
 		z-index                     : 15;
 		-webkit-column-break-inside : avoid;
-		-moz-column-break-inside    : avoid;
-		-o-column-break-inside      : avoid;
-		-ms-column-break-inside     : avoid;
-		column-break-inside         : avoid;
+		page-break-inside           : avoid;
+		break-inside                : avoid;
+		overflow: hidden; /* Firefox fix */
 	}
 	//Better spacing for spell blocks
 	h4+p+hr+ul{
-		margin-top:-0.5em
+		margin-top : -0.5em
+	}
+	//Text indent right after table
+	table+p{
+		text-indent : 1em;
+	}
+	// Nested lists
+	ul ul,ol ol,ul ol,ol ul{
+		margin-bottom : 0px;
+		margin-left   : 1.5em;
+	}
+	li{
+		-webkit-column-break-inside : avoid;
+		page-break-inside           : avoid;
+		break-inside                : avoid;
+	}
+}
+//*****************************
+// *         SPELL LIST
+// *****************************/
+.phb .spellList{
+	.useSansSerif();
+	column-count        : 4;
+	column-span         : all;
+	-webkit-column-span : all;
+	-moz-column-span    : all;
+	ul+h5{
+		margin-top : 15px;
+	}
+	p, ul{
+		font-size   : 0.352cm;
+		line-height : 1.3em;
+	}
+	ul{
+		margin-bottom               : 0.5em;
+		padding-left                : 1em;
+		text-indent                 : -1em;
+		list-style-type             : none;
+		-webkit-column-break-inside : auto;
+		page-break-inside           : auto;
+		break-inside                : auto;
+	}
+}
+//*****************************
+// *         WIDE
+// *****************************/
+.phb .wide{
+	column-span         : all;
+	-webkit-column-span : all;
+	-moz-column-span    : all;
+}
+//*****************************
+// *       CLASS TABLE
+// *****************************/
+.phb .classTable{
+	margin-top          : 25px;
+	margin-bottom       : 40px;
+	border-collapse     : separate;
+	background-color    : white;
+	border              : initial;
+	border-style        : solid;
+	border-image-outset : 25px 17px;
+	border-image-repeat : stretch;
+	border-image-slice  : 150 200 150 200;
+	border-image-source : @frameBorderImage;
+	border-image-width  : 47px;
+	h5{
+		margin-bottom : 10px;
+	}
+}
+//************************************
+// *       DESCRIPTIVE TEXT BOX
+// ************************************/
+.phb .descriptive{
+	display             : block-inline;
+	margin-bottom       : 1em;
+	background-color    : #faf7ea;
+	font-family         : ScalySans;
+	border-style        : solid;
+	border-width        : 7px;
+	border-image        : @descriptiveBoxImage 12 stretch;
+	border-image-outset : 4px;
+	box-shadow          : 0px 0px 6px #faf7ea;
+	p{
+		display        : block;
+		padding-bottom : 0px;
+		line-height    : 1.5em;
+	}
+	p + p {
+		padding-top : .8em;
+	}
+	em {
+		font-family : ScalySans;
+		font-style  : italic;
+	}
+	strong {
+		font-family    : ScalySans;
+		font-weight    : 800;
+		letter-spacing : -0.02em;
+	}
+}
+.phb pre+.descriptive{
+	margin-top : 8px;
+}
+//*****************************
+// *      TABLE OF CONTENTS
+// *****************************/
+.phb .toc{
+	-webkit-column-break-inside : avoid;
+	page-break-inside           : avoid;
+	break-inside                : avoid;
+	a{
+		color           : black;
+		text-decoration : none;
+		&:hover{
+			text-decoration : underline;
+		}
+	}
+	ul{
+		padding-left    : 0;
+		list-style-type : none;
+	}
+	&>ul>li{
+		margin-bottom : 10px;
 	}
 }

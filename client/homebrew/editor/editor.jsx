@@ -1,57 +1,146 @@
-var React = require('react');
-var _ = require('lodash');
-var cx = require('classnames');
-var SnippetIcons = require('./snippets/snippets.js');
+const React = require('react');
+const createClass = require('create-react-class');
+const _ = require('lodash');
+const cx = require('classnames');
+
+const CodeEditor = require('naturalcrit/codeEditor/codeEditor.jsx');
+const SnippetBar = require('./snippetbar/snippetbar.jsx');
+const MetadataEditor = require('./metadataEditor/metadataEditor.jsx');
 
 
-var Editor = React.createClass({
-	getDefaultProps: function() {
+const splice = function(str, index, inject){
+	return str.slice(0, index) + inject + str.slice(index);
+};
+
+const SNIPPETBAR_HEIGHT = 25;
+
+const Editor = createClass({
+	getDefaultProps : function() {
 		return {
-			text : "",
-			onChange : function(){}
+			value    : '',
+			onChange : ()=>{},
+
+			metadata         : {},
+			onMetadataChange : ()=>{},
 		};
 	},
-
-	componentDidMount: function() {
-		this.refs.textarea.focus();
+	getInitialState : function() {
+		return {
+			showMetadataEditor : false
+		};
+	},
+	cursorPosition : {
+		line : 0,
+		ch   : 0
 	},
 
-	handleTextChange : function(e){
-		this.props.onChange(e.target.value);
+	componentDidMount : function() {
+		this.updateEditorSize();
+		this.highlightPageLines();
+		window.addEventListener('resize', this.updateEditorSize);
+	},
+	componentWillUnmount : function() {
+		window.removeEventListener('resize', this.updateEditorSize);
 	},
 
-	iconClick : function(snippetFn){
-		var curPos = this.refs.textarea.selectionStart;
-		this.props.onChange(this.props.text.slice(0, curPos) +
-			snippetFn() +
-			this.props.text.slice(curPos + 1));
+	updateEditorSize : function() {
+		let paneHeight = this.refs.main.parentNode.clientHeight;
+		paneHeight -= SNIPPETBAR_HEIGHT + 1;
+		this.refs.codeEditor.codeMirror.setSize(null, paneHeight);
 	},
 
-	renderTemplateIcons : function(){
-		return _.map(SnippetIcons, (t) => {
-			return <div className='icon' key={t.icon}
-				onClick={this.iconClick.bind(this, t.snippet)}
-				data-tooltip={t.tooltip}>
-				<i className={'fa ' + t.icon} />
-			</div>;
-		})
+	handleTextChange : function(text){
+		this.props.onChange(text);
+	},
+	handleCursorActivty : function(curpos){
+		this.cursorPosition = curpos;
+	},
+	handleInject : function(injectText){
+		const lines = this.props.value.split('\n');
+		lines[this.cursorPosition.line] = splice(lines[this.cursorPosition.line], this.cursorPosition.ch, injectText);
+
+		this.handleTextChange(lines.join('\n'));
+		this.refs.codeEditor.setCursorPosition(this.cursorPosition.line, this.cursorPosition.ch  + injectText.length);
+	},
+	handgleToggle : function(){
+		this.setState({
+			showMetadataEditor : !this.state.showMetadataEditor
+		});
+	},
+
+	getCurrentPage : function(){
+		const lines = this.props.value.split('\n').slice(0, this.cursorPosition.line + 1);
+		return _.reduce(lines, (r, line)=>{
+			if(line.indexOf('\\page') !== -1) r++;
+			return r;
+		}, 1);
+	},
+
+	highlightPageLines : function(){
+		if(!this.refs.codeEditor) return;
+		const codeMirror = this.refs.codeEditor.codeMirror;
+
+		const lineNumbers = _.reduce(this.props.value.split('\n'), (r, line, lineNumber)=>{
+			if(line.indexOf('\\page') !== -1){
+				codeMirror.addLineClass(lineNumber, 'background', 'pageLine');
+				r.push(lineNumber);
+			}
+			return r;
+		}, []);
+		return lineNumbers;
+	},
+
+
+	brewJump : function(){
+		const currentPage = this.getCurrentPage();
+		window.location.hash = `p${currentPage}`;
+	},
+
+	//Called when there are changes to the editor's dimensions
+	update : function(){
+		this.refs.codeEditor.updateSize();
+	},
+
+	renderMetadataEditor : function(){
+		if(!this.state.showMetadataEditor) return;
+		return <MetadataEditor
+			metadata={this.props.metadata}
+			onChange={this.props.onMetadataChange}
+		/>;
 	},
 
 	render : function(){
-		var self = this;
-		return(
-			<div className='editor'>
-				<div className='textIcons'>
-					{this.renderTemplateIcons()}
+		this.highlightPageLines();
+		return (
+			<div className='editor' ref='main'>
+				<SnippetBar
+					brew={this.props.value}
+					onInject={this.handleInject}
+					onToggle={this.handgleToggle}
+					showmeta={this.state.showMetadataEditor} />
+				{this.renderMetadataEditor()}
+				<CodeEditor
+					ref='codeEditor'
+					wrap={true}
+					language='gfm'
+					value={this.props.value}
+					onChange={this.handleTextChange}
+					onCursorActivity={this.handleCursorActivty} />
+
+				{/*
+				<div className='brewJump' onClick={this.brewJump}>
+					<i className='fa fa-arrow-right' />
 				</div>
-				<textarea
-					ref='textarea'
-					value={this.props.text}
-					onChange={this.handleTextChange} />
+				*/}
 			</div>
 		);
 	}
 });
 
 module.exports = Editor;
+
+
+
+
+
 

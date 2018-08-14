@@ -1,22 +1,33 @@
-# NaturalCrit
-A tool suite for DMs to use for D&D
+# The Homebrewery
+The Homebrewery is a tool for making authentic looking [D&D content](http://dnd.wizards.com/products/tabletop-games/rpg-products/rpg_playershandbook) using only [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). Check it out [here](http://homebrewery.naturalcrit.com).
 
 
-### Getting started
-1. Make sure you have [node](https://nodejs.org/en/)
-1. Clone down the repo
-1. In your terminal, head to the repo
-1. Run `npm install` to get all the dependacies
-2. Run `npm install -g gulp` to install the gulp build tool
-1. Run `gulp fresh`, this will compile and build all the needed libraries (this only has to be done once, unless you add more libs)
-1. Run `gulp` to run the project locally. Should be accessible at `localhost:8000`
-2. Any changes to files within the proejct will be detected and the propject will automatically re-build
+### issues, suggestions, bugs
+If you run into any issues using The Homebrewery, please submit an issue [here](/issues)
 
-**Notes:** If you'd like to create and edit homebrews, you'll need to have MongoDB installed and running.
 
-Have fun!
+### local dev
+Homebrewery is open source, so feel free to clone it, tinker with it, or run your own local version.
 
+#### pre-reqs
+1. install [node](https://nodejs.org/en/)
+1. install [mongodb](https://www.mongodb.com/)
+
+#### getting started
+1. clone it
+1. `npm install`
+1. `npm build`
+1. `npm start`
+
+#### standalone PHB stylesheet
+If you just want the stylesheet that is generated to make pages look like they are from the Player's Handbook, you will find it [here](https://github.com/stolksdorf/homebrewery/blob/master/phb.standalone.css)
+
+If you are developing locally and would like to generate your own, follow the above steps and then run `npm run phb`.
 
 ### changelog
 
-You can check out the changelog [here](https://github.com/stolksdorf/NaturalCrit/blob/master/changelog.md)
+You can check out the changelog [here](https://github.com/stolksdorf/homebrewery/blob/master/changelog.md)
+
+### license
+
+This project is licensed under [MIT](./license)

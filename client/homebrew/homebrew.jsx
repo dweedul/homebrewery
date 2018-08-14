@@ -1,45 +1,89 @@
-var React = require('react');
-var _ = require('lodash');
-var cx = require('classnames');
+const React = require('react');
+const createClass = require('create-react-class');
+const _ = require('lodash');
+const cx = require('classnames');
 
-var CreateRouter = require('pico-router').createRouter;
+const CreateRouter = require('pico-router').createRouter;
 
-var HomePage = require('./homePage/homePage.jsx');
-var EditPage = require('./editPage/editPage.jsx');
-var SharePage = require('./sharePage/sharePage.jsx');
+const HomePage = require('./pages/homePage/homePage.jsx');
+const EditPage = require('./pages/editPage/editPage.jsx');
+const UserPage = require('./pages/userPage/userPage.jsx');
+const SharePage = require('./pages/sharePage/sharePage.jsx');
+const NewPage = require('./pages/newPage/newPage.jsx');
+const ErrorPage = require('./pages/errorPage/errorPage.jsx');
+const PrintPage = require('./pages/printPage/printPage.jsx');
 
-var Router;
-var Homebrew = React.createClass({
-	getDefaultProps: function() {
+let Router;
+const Homebrew = createClass({
+	getDefaultProps : function() {
 		return {
-			url : "",
-			welcomeText : "",
-			brew : {
-				text : "",
-				shareId : null,
-				editId : null,
+			url         : '',
+			welcomeText : '',
+			changelog   : '',
+			version     : '0.0.0',
+			account     : null,
+			brew        : {
+				title     : '',
+				text      : '',
+				shareId   : null,
+				editId    : null,
 				createdAt : null,
 				updatedAt : null,
 			}
 		};
 	},
-	componentWillMount: function() {
+	componentWillMount : function() {
+		global.account = this.props.account;
+		global.version = this.props.version;
+
+
 		Router = CreateRouter({
-			'/homebrew/edit/:id' : (args) => {
-				return <EditPage id={args.id} entry={this.props.brew} />
+			'/edit/:id' : (args)=>{
+				if(!this.props.brew.editId){
+					return <ErrorPage errorId={args.id}/>;
+				}
+
+				return <EditPage
+					id={args.id}
+					brew={this.props.brew} />;
 			},
-			'/homebrew/share/:id' : (args) => {
-				return <SharePage id={args.id} entry={this.props.brew} />
+
+			'/share/:id' : (args)=>{
+				if(!this.props.brew.shareId){
+					return <ErrorPage errorId={args.id}/>;
+				}
+
+				return <SharePage
+					id={args.id}
+					brew={this.props.brew} />;
 			},
-			'/homebrew*' : <HomePage welcomeText={this.props.welcomeText} />,
+			'/user/:username' : (args)=>{
+				return <UserPage
+					username={args.username}
+					brews={this.props.brews}
+				/>;
+			},
+			'/print/:id' : (args, query)=>{
+				return <PrintPage brew={this.props.brew} query={query}/>;
+			},
+			'/print' : (args, query)=>{
+				return <PrintPage query={query}/>;
+			},
+			'/new' : (args)=>{
+				return <NewPage />;
+			},
+			'/changelog' : (args)=>{
+				return <SharePage
+					brew={{ title: 'Changelog', text: this.props.changelog }} />;
+			},
+			'*' : <HomePage
+				welcomeText={this.props.welcomeText} />,
 		});
 	},
 	render : function(){
-		return(
-			<div className='homebrew'>
-				<Router initialUrl={this.props.url}/>
-			</div>
-		);
+		return <div className='homebrew'>
+			<Router defaultUrl={this.props.url}/>
+		</div>;
 	}
 });
 

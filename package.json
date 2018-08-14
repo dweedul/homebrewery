@@ -1,31 +1,66 @@
 {
-  "name": "naturalCrit",
-  "description": "A super rad project!",
-  "version": "0.0.0",
+  "name": "homebrewery",
+  "description": "Create authentic looking D&D homebrews using only markdown",
+  "version": "2.8.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/stolksdorf/homebrewery.git"
+  },
   "scripts": {
-    "postinstall": "gulp prod",
+    "dev": "node scripts/dev.js",
+    "quick": "node scripts/quick.js",
+    "build": "node scripts/build.js",
+    "lint": "eslint --fix **/*.{js,jsx}",
+    "lint:dry": "eslint **/*.{js,jsx}",
+    "circleci": "npm test && eslint **/*.{js,jsx} --max-warnings=0",
+    "verify": "npm run lint && npm test",
+    "test": "pico-check",
+    "test:dev": "pico-check -v -w",
+    "phb": "node scripts/phb.js",
+    "prod": "set NODE_ENV=production && npm run build",
+    "postinstall": "npm run build",
     "start": "node server.js"
   },
-  "author": "",
-  "license": "BSD-2-Clause",
+  "author": "stolksdorf",
+  "license": "MIT",
+  "eslintIgnore": [
+    "build/*"
+  ],
+  "pico-check": {
+    "require": "./tests/test.init.js"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ]
+  },
   "dependencies": {
-    "app-module-path": "^1.0.4",
-    "basic-auth": "^1.0.3",
+    "babel-preset-env": "^1.1.8",
+    "babel-preset-react": "^6.24.1",
+    "basic-auth": "^2.0.0",
     "body-parser": "^1.14.2",
     "classnames": "^2.2.0",
+    "codemirror": "^5.22.0",
+    "cookie-parser": "^1.4.3",
+    "create-react-class": "^15.6.3",
     "express": "^4.13.3",
-    "gulp": "^3.9.0",
-    "jsoneditor": "^4.2.1",
-    "lodash": "^3.10.1",
+    "jwt-simple": "^0.5.1",
+    "lodash": "^4.11.2",
     "marked": "^0.3.5",
     "moment": "^2.11.0",
-    "mongoose": "^4.3.3",
-    "pico-flux": "^1.1.0",
-    "pico-router": "^1.0.0",
-    "react": "^0.14.2",
-    "react-dom": "^0.14.2",
+    "mongoose": "^5.0.13",
+    "nconf": "^0.10.0",
+    "pico-router": "^2.1.0",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
     "shortid": "^2.2.4",
-    "superagent": "^1.6.1",
-    "vitreum": "^3.1.1"
+    "superagent": "^3.8.2",
+    "vitreum": "^4.10.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-plugin-react": "^7.7.0",
+    "pico-check": "^1.0.3"
   }
 }
